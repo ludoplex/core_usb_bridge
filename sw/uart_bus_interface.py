@@ -43,7 +43,7 @@ class UartBusInterface:
     ##################################################################
     def read32(self, addr):
         # Connect if required
-        if self.uart == None:
+        if self.uart is None:
             self.connect()
 
         # Send read command
@@ -56,12 +56,9 @@ class UartBusInterface:
         self.uart.write(cmd)
 
         value = 0
-        idx   = 0
-        while (idx < 4):
+        for idx in range(4):
             b = self.uart.read(1)
             value |= (ord(b) << (idx * 8))
-            idx += 1
-
         return value
 
     ##################################################################
@@ -69,7 +66,7 @@ class UartBusInterface:
     ##################################################################
     def write32(self, addr, value):
         # Connect if required
-        if self.uart == None:
+        if self.uart is None:
             self.connect()
 
         # Send write command
@@ -90,7 +87,7 @@ class UartBusInterface:
     ##################################################################
     def write(self, addr, data, length, addr_incr=True, max_block_size=-1):
         # Connect if required
-        if self.uart == None:
+        if self.uart is None:
             self.connect()
 
         # Write blocks
@@ -105,9 +102,7 @@ class UartBusInterface:
 
         while remainder > 0:
             l = max_block_size
-            if l > remainder:
-                l = remainder
-
+            l = min(l, remainder)
             cmd = bytearray(2 + 4 + l)
             cmd[0] = self.CMD_WRITE
             cmd[1] = l & 0xFF
@@ -136,7 +131,7 @@ class UartBusInterface:
     ##################################################################
     def read(self, addr, length, addr_incr=True, max_block_size=-1):
         # Connect if required
-        if self.uart == None:
+        if self.uart is None:
             self.connect()
 
         idx       = 0
@@ -151,9 +146,7 @@ class UartBusInterface:
 
         while remainder > 0:
             l = max_block_size
-            if l > remainder:
-                l = remainder
-
+            l = min(l, remainder)
             cmd = bytearray(2 + 4)
             cmd[0] = self.CMD_READ
             cmd[1] = l & 0xFF
@@ -166,7 +159,7 @@ class UartBusInterface:
             self.uart.write(cmd)
 
             # Read block response
-            for i in range(l):
+            for _ in range(l):
                 data[idx] = ord(self.uart.read(1)) & 0xFF
                 idx += 1
 

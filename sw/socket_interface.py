@@ -34,7 +34,7 @@ class SocketInterface:
     ##################################################################
     def read32(self, addr):
         # Connect if required
-        if self.sock == None:
+        if self.sock is None:
             self.connect()
 
         # Send read command
@@ -47,12 +47,9 @@ class SocketInterface:
         self.sock.sendto(cmd, self.server_addr)
 
         value = 0
-        idx   = 0
         resp  = self.sock.recv(4)
-        for b in resp:
+        for idx, b in enumerate(resp):
             value |= (ord(b) << (idx * 8))
-            idx += 1
-
         return value
 
     ##################################################################
@@ -60,7 +57,7 @@ class SocketInterface:
     ##################################################################
     def write32(self, addr, value):
         # Connect if required
-        if self.sock == None:
+        if self.sock is None:
             self.connect()
 
         # Send write command
@@ -82,7 +79,7 @@ class SocketInterface:
     ##################################################################
     def write(self, addr, data, length, addr_incr=True, max_block_size=-1):
         # Connect if required
-        if self.sock == None:
+        if self.sock is None:
             self.connect()
 
         # Write blocks
@@ -97,9 +94,7 @@ class SocketInterface:
 
         while remainder > 0:
             l = max_block_size
-            if l > remainder:
-                l = remainder
-
+            l = min(l, remainder)
             cmd = bytearray(2 + 4 + l)
             cmd[0] = self.CMD_WRITE
             cmd[1] = l & 0xFF
@@ -129,7 +124,7 @@ class SocketInterface:
     ##################################################################
     def read(self, addr, length, addr_incr=True, max_block_size=-1):
         # Connect if required
-        if self.sock == None:
+        if self.sock is None:
             self.connect()
 
         idx       = 0
@@ -144,9 +139,7 @@ class SocketInterface:
 
         while remainder > 0:
             l = max_block_size
-            if l > remainder:
-                l = remainder
-
+            l = min(l, remainder)
             cmd = bytearray(2 + 4)
             cmd[0] = self.CMD_READ
             cmd[1] = l & 0xFF

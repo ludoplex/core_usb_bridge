@@ -58,11 +58,7 @@ def main(argv):
         data_rb = bus_if.read(addr, filesize)
 
         for i in range(filesize):
-            if sys.version_info[0] < 3:
-                exp = ord(data[i]) & 0xFF
-            else:
-                exp = data[i] & 0xFF
-
+            exp = ord(data[i]) & 0xFF if sys.version_info[0] < 3 else data[i] & 0xFF
             if data_rb[i] != exp:
                 print("Data mismatches @ %d: %s != %d" % (addr + i,  str(data_rb[i]), exp))
                 sys.exit(-1)
